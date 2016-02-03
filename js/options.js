@@ -2,7 +2,8 @@ var masterpw = "", syncloadcount = 0, syncsetcount = 0;
 var bcrypt = new bCrypt();
 
 $(document).ready(function() {
-	var randParanoia = 10;
+	var randParanoia = 5;
+	var defaultKeyStrength = 2048;
 	sjcl.random = new sjcl.prng(randParanoia);
 	sjcl.random.startCollectors();
 	
@@ -108,7 +109,7 @@ $(document).ready(function() {
 		
 		createRandomString(function(createdString) {
 			var createOptions = {
-				numBits: 4096,
+				numBits: defaultKeyStrength,
 				userId: user,
 				passphrase: createdString
 			};
@@ -126,7 +127,7 @@ $(document).ready(function() {
 			}).catch(function(error) {
 				alert("Error: "+error);
 			});
-		}, 30);
+		}, 30, randParanoia);
 	});	
 	
 	$("#removebutton").click(function(e) {
@@ -316,12 +317,12 @@ function getshahash(str)
 	return hash;
 }
 
-function createRandomString (callback, length) {
+function createRandomString (callback, length, paranoia) {
   var randomBase64String = '',
   checkReadyness;
 
   checkReadyness = setInterval(function () {
-    if(sjcl.random.isReady(10)) {
+    if(sjcl.random.isReady(paranoia)) {
       while(randomBase64String.length < length) {
         randomInt = sjcl.random.randomWords(1, 10)[0];
         randomBase64String += btoa(randomInt);
